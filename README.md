@@ -320,9 +320,13 @@ Open a shell on a Capistrano deploy target.
 
 Example: `geordi shell production`
 
-Lets you select the server to connect to when called with `--select-server`:
+Lets you select the server to connect to from a menu when called with `--select-server` or the alias `-s`:
 
     geordi shell production -s
+
+Lets you select the server to connect to directly by passing the number:
+
+    geordi shell production -s 2
 
 
 ### `geordi tests`
