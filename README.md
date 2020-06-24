@@ -92,6 +92,13 @@ or `-d`.
 - *Options:* Any unknown option will be passed through to Cucumber,
 e.g. `--format pretty`.
 
+- *VNC sessions:* By default, the test browsers will be run in a VNC session.
+This behaviour can be turned off by specifying
+
+    headless_browser: true
+
+in a `.geordi.yml` file in the working directory.
+
 
 ### `geordi delete-dumps [DIRECTORY]`
 
