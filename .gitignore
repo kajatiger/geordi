@@ -4,5 +4,6 @@
 pkg/*
 .DS_Store
 .pt_project_id
+.geordi.yml
 tmp
 .byebug_history

@@ -2,12 +2,14 @@ class Gitpt
   require 'yaml'
   require 'highline'
   require 'tracker_api'
+  require 'geordi/settings'
 
   SETTINGS_FILE_NAME = '.gitpt'.freeze
   PROJECT_IDS_FILE_NAME = '.pt_project_id'.freeze
 
   def initialize
     self.highline = HighLine.new
+    self.settings = GeordiSettings.new
     self.client = build_client(read_settings)
   end
 
@@ -24,27 +26,32 @@ No staged changes. Will create an empty commit.
 
   private
 
-  attr_accessor :highline, :client
+  attr_accessor :highline, :client, :settings
 
   def read_settings
-    file_path = File.join(ENV['HOME'], SETTINGS_FILE_NAME)
+    unless settings.pivotal_tracker_api_key
+      # check for (deprecated) .gitpt file
+      file_path = File.join(ENV['HOME'], SETTINGS_FILE_NAME)
+      if File.exist?(file_path)
+        token = YAML.load_file(file_path).fetch :token
+        highline.say HighLine::RESET
+        highline.say highlight("The ~/.gitpt file is deprecated.\n")
+        highline.say "The contained setting will be moved to #{bold '~/.config/geordi/global.yml'}."
+        highline.say "If you don't need to work with an older version of geordi you can delete #{bold '~/.gitpt'} now."
+      else
+        highline.say HighLine::RESET
+        highline.say "Welcome to #{bold 'gitpt'}.\n\n"
 
-    unless File.exist?(file_path)
-      highline.say HighLine::RESET
-      highline.say "Welcome to #{bold 'gitpt'}.\n\n"
-
-      highline.say highlight('Your settings are missing or invalid.')
-      highline.say "Please configure your Pivotal Tracker access.\n\n"
-      token = highline.ask bold('Your API key:') + ' '
-      highline.say "\n"
-
-      settings = { token: token }
-      File.open(file_path, 'w') do |file|
-        file.write settings.to_yaml
+        highline.say highlight('Your settings are missing or invalid.')
+        highline.say "Please configure your Pivotal Tracker access.\n\n"
+        token = highline.ask bold('Your API key:') + ' '
+        highline.say "\n"
       end
+
+      settings.pivotal_tracker_api_key = token
     end
 
-    YAML.load_file(file_path)
+    { token: settings.pivotal_tracker_api_key }
   end
 
   def build_client(settings)
@@ -57,19 +64,26 @@ No staged changes. Will create an empty commit.
   end
 
   def read_project_ids
-    file_path = PROJECT_IDS_FILE_NAME
+    project_ids = settings.pivotal_tracker_project_id
 
-    if File.exist?(file_path)
-      project_ids = File.read('.pt_project_id').split(/[\s]+/).map(&:to_i)
+    file_path = PROJECT_IDS_FILE_NAME
+    if !project_ids and File.exist?(file_path)
+      project_ids = File.read('.pt_project_id')
+      Geordi::Interaction.warn "The usage of the .pt_project_id file is deprecated."
+      Geordi::Interaction.note Util.strip_heredoc(<<-INSTRUCTIONS)
+          Please remove this file from your project and add or extend the .geordi.yml file with the following content:
+            pivotal_tracker_project_id: #{project_ids}
+      INSTRUCTIONS
     end
 
-    if project_ids && (project_ids.size > 0)
-      project_ids
+    if project_ids && (project_ids.to_s.length > 0)
+      project_ids.to_s.split(/[\s]+/).map(&:to_i)
     else
-      Geordi::Interaction.warn "Sorry, I could not find a project ID in #{file_path} :("
+      Geordi::Interaction.warn "Sorry, I could not find a project ID in .geordi.yml :("
       puts
 
-      puts "Please put at least one Pivotal Tracker project id into #{file_path} in this directory."
+      puts "Please put at least one Pivotal Tracker project id into the .geordi.yml file in this directory, e.g:\n"
+      puts "pivotal_tracker_project_id: 123456\n"
       puts 'You may add multiple IDs, separated using white space.'
       exit 1
     end
