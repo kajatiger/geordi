@@ -7,9 +7,6 @@ module Geordi
     GLOBAL_SETTINGS_FILE_NAME = Util.testing? ? './tmp/global_settings.yml'.freeze : File.join(ENV['HOME'], '.config/geordi/global.yml').freeze
     LOCAL_SETTINGS_FILE_NAME = Util.testing? ? './tmp/local_settings.yml'.freeze : './.geordi.yml'.freeze
 
-    GITPT_FILE_NAME = '.gitpt'.freeze
-    PROJECT_IDS_FILE_NAME = '.pt_project_id'.freeze
-
     ALLOWED_GLOBAL_SETTINGS = %w[ pivotal_tracker_api_key ].freeze
     ALLOWED_LOCAL_SETTINGS = %w[ use_vnc pivotal_tracker_project_ids ].freeze
 
@@ -39,24 +36,30 @@ module Geordi
 
       case project_ids
       when Array
-        return project_ids if project_ids.size > 0
+        # nothing to do
       when String
-        return project_ids.split(/[\s]+/).map(&:to_i)
+        project_ids = project_ids.split(/[\s]+/).map(&:to_i)
       when Integer
-        return [project_ids]
+        project_ids = [project_ids]
+      else
+        project_ids = []
       end
 
-      puts
-      Geordi::Interaction.warn "Sorry, I could not find a project ID in .geordi.yml :("
-      puts
+      if project_ids.empty?
+        puts
+        Geordi::Interaction.warn "Sorry, I could not find a project ID in .geordi.yml :("
+        puts
 
-      puts "Please put at least one Pivotal Tracker project id into the .geordi.yml file in this directory, e.g."
-      puts
-      puts "pivotal_tracker_project_ids:"
-      puts "- 123456"
-      puts
-      puts 'You may add multiple IDs.'
-      exit 1
+        puts "Please put at least one Pivotal Tracker project id into the .geordi.yml file in this directory, e.g."
+        puts
+        puts "pivotal_tracker_project_ids:"
+        puts "- 123456"
+        puts
+        puts 'You may add multiple IDs.'
+        exit 1
+      end
+
+      project_ids
     end
 
     private
@@ -109,7 +112,7 @@ module Geordi
 
     # deprecated
     def gitpt_api_key_old
-      file_path = File.join(ENV['HOME'], GITPT_FILE_NAME)
+      file_path = File.join(ENV['HOME'], '.gitpt')
       if File.exist?(file_path)
         token = YAML.load_file(file_path).fetch :token
         highline.say HighLine::RESET
@@ -135,8 +138,8 @@ module Geordi
       token
     end
 
+    # deprecated
     def pt_project_ids_old
-      file_path = PROJECT_IDS_FILE_NAME
       if File.exist?(file_path)
         project_ids = File.read('.pt_project_id')
         Geordi::Interaction.warn "The usage of the .pt_project_id file is deprecated."
