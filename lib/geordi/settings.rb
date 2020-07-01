@@ -3,6 +3,7 @@ module Geordi
     require 'yaml'
 
     require File.expand_path('util', __dir__)
+    require File.expand_path('interaction', __dir__)
 
     GLOBAL_SETTINGS_FILE_NAME = Util.testing? ? './tmp/global_settings.yml'.freeze : File.join(ENV['HOME'], '.config/geordi/global.yml').freeze
     LOCAL_SETTINGS_FILE_NAME = Util.testing? ? './tmp/local_settings.yml'.freeze : './.geordi.yml'.freeze
@@ -115,10 +116,9 @@ module Geordi
       file_path = File.join(ENV['HOME'], '.gitpt')
       if File.exist?(file_path)
         token = YAML.load_file(file_path).fetch :token
-        highline.say HighLine::RESET
-        highline.say highlight("The ~/.gitpt file is deprecated.\n")
-        highline.say "The contained setting will be moved to #{bold '~/.config/geordi/global.yml'}."
-        highline.say "If you don't need to work with an older version of geordi you can delete #{bold '~/.gitpt'} now."
+        Geordi::Interaction.warn "The ~/.gitpt file is deprecated."
+        Geordi::Interaction.note "The contained setting will be moved to ~/.config/geordi/global.yml."
+        Geordi::Interaction.note "If you don't need to work with an older version of geordi you can delete ~/.gitpt now."
         self.pivotal_tracker_api_key = token
 
         token
@@ -126,21 +126,18 @@ module Geordi
     end
 
     def inquire_pt_api_key
-      highline.say HighLine::RESET
-      highline.say "Welcome to #{bold 'gitpt'}.\n\n"
-
-      highline.say highlight('Your settings are missing or invalid.')
-      highline.say "Please configure your Pivotal Tracker access.\n\n"
-      token = highline.ask bold('Your API key:') + ' '
+      Geordi::Interaction.warn 'Your settings are missing or invalid.'
+      Geordi::Interaction.warn "Please configure your Pivotal Tracker access."
+      token = Geordi::Interaction.prompt 'Your API key:'
       self.pivotal_tracker_api_key = token
-      highline.say "\n"
+      puts
 
       token
     end
 
     # deprecated
     def pt_project_ids_old
-      if File.exist?(file_path)
+      if File.exist?('.pt_project_id')
         project_ids = File.read('.pt_project_id')
         Geordi::Interaction.warn "The usage of the .pt_project_id file is deprecated."
         Geordi::Interaction.note Util.strip_heredoc(<<-INSTRUCTIONS)
