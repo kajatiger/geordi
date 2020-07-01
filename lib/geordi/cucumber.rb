@@ -17,11 +17,11 @@ module Geordi
 
     def run(files, cucumber_options, options = {})
       self.argv = files + cucumber_options.map { |option| option.split('=') }.flatten
-      self.settings = GeordiSettings.new
+      self.settings = Geordi::Settings.new
 
       consolidate_rerun_txt_files
       show_features_to_run
-      setup_vnc unless settings.headless_browser
+      setup_vnc if settings.use_vnc?
 
       command = use_parallel_tests?(options) ? parallel_execution_command : serial_execution_command
       Interaction.note_cmd(command) if options[:verbose]
