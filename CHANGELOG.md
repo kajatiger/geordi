@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 - Add #91: Now there is an option to start cucumber without a VNC session. This is configured by the .geordi.yml file.
 - Deprecated the `.pt_project_id` file in favor of `.geordi.yml`.
 - Deprecated the `~/.gitpt` file in favor of `~/.config/geordi/global.yml`.
+- Fix: `|line|.start_with /[A-Z]/` does not work in Ruby < 2.5. This affected `geordi commit`.
+
 
 ## 3.1.0 2020-06-03
 
