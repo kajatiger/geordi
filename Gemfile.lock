@@ -7,7 +7,8 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
-    addressable (2.3.8)
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
     aruba (0.6.2)
       childprocess (>= 0.3.6)
       cucumber (>= 1.1.1)
@@ -61,6 +62,7 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    public_suffix (4.0.6)
     racc (1.5.2)
     rake (10.5.0)
     representable (3.0.4)
