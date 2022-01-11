@@ -116,7 +116,7 @@ GEM
     ruby2_keywords (0.0.5)
     sys-uname (1.2.2)
       ffi (~> 1.1)
-    thor (1.0.1)
+    thor (1.2.1)
     thread_safe (0.3.6)
     tracker_api (1.13.0)
       addressable
