@@ -62,7 +62,7 @@ GEM
       multipart-post (~> 2)
     faraday-net_http (3.0.1)
     ffi (1.15.5)
-    highline (1.6.21)
+    highline (2.0.3)
     ice_nine (0.11.2)
     launchy (2.5.0)
       addressable (~> 2.7)
