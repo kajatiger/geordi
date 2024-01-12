@@ -7,6 +7,7 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
+    abbrev (0.1.2)
     addressable (2.8.1)
       public_suffix (>= 2.0.2, < 6.0)
     aruba (2.1.0)
@@ -62,7 +63,8 @@ GEM
       multipart-post (~> 2)
     faraday-net_http (3.0.1)
     ffi (1.15.5)
-    highline (1.6.21)
+    highline (3.0.0)
+      abbrev
     ice_nine (0.11.2)
     launchy (2.5.0)
       addressable (~> 2.7)
