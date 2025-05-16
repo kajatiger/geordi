@@ -74,8 +74,8 @@ GEM
     multi_json (1.15.0)
     multi_test (1.1.0)
     multipart-post (2.2.3)
-    parallel (0.5.16)
-    parallel_tests (0.6.18)
+    parallel (1.27.0)
+    parallel_tests (5.2.0)
       parallel
     pry (0.13.1)
       coderay (~> 1.1)
